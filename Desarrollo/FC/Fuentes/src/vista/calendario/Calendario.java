@@ -355,4 +355,8 @@ public class Calendario extends JFrame {
             System.out.println("uno un problema...");
         }
     }
+/*
+    private void clickDerechoItem(){
+        ItemMouseEvent e;
+    }*/
 }

@@ -5,10 +5,9 @@
         <group>
             <file>file:/E:/ProyectoFollow1/ProyectoFollow1/src/vista/calendario/Calendario.java</file>
             <file>file:/E:/ProyectoFollow1/ProyectoFollow1/src/vista/calendario/NuevaActividad.java</file>
-            <file>file:/E:/ProyectoFollow1/ProyectoFollow1/src/vista/calendario/VerEditarEliminarActividad.java</file>
-            <file>file:/E:/ProyectoFollow1/ProyectoFollow1/src/Entidades/Tarea.java</file>
             <file>file:/E:/ProyectoFollow1/ProyectoFollow1/src/Test/ProyectoFollow.java</file>
             <file>file:/E:/ProyectoFollow1/ProyectoFollow1/src/vista/calendario/NuevoCurso.java</file>
+            <file>file:/E:/ProyectoFollow1/ProyectoFollow1/src/JDBC/ConexionBD.java</file>
         </group>
     </open-files>
 </project-private>

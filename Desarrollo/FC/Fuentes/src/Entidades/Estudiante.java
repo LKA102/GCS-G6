@@ -15,6 +15,9 @@ public class Estudiante {
     String escuela;
     String plan;
 
+    public Estudiante() {
+    }
+
     public int getId() {
         return id;
     }

@@ -1,10 +1,4 @@
-package Entidades;
-
-import JDBC.ConexionBD;
-import java.beans.Statement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+package entidades;
 
 public class Estudiante {
     int id;
@@ -14,7 +8,8 @@ public class Estudiante {
     String facultad;
     String escuela;
     String plan;
-
+    String ciclo;
+    
     public Estudiante() {
     }
 
@@ -72,5 +67,12 @@ public class Estudiante {
 
     public void setPlan(String plan) {
         this.plan = plan;
+    }
+    public String getCiclo() {
+        return ciclo;
+    }
+
+    public void setCiclo(String ciclo) {
+        this.ciclo = ciclo;
     }
 }

@@ -2,28 +2,30 @@ package vista.calendario;
 
 
 import vista.principal.*;
-import Entidades.Estudiante;
-import Controladores.CtrlEstudiante;
-import Entidades.Tarea;
-import JDBC.ConexionBD;
+import entidades.Estudiante;
+import controladores.CtrlEstudiante;
+import entidades.Tarea;
+import jdbc.ConexionBD;
 import com.mindfusion.common.DateTime;
 import com.mindfusion.common.Orientation;
 import com.mindfusion.drawing.Colors;
 import com.mindfusion.drawing.SolidBrush;
 import com.mindfusion.scheduling.Calendar;
+import com.mindfusion.scheduling.CalendarAdapter;
 import com.mindfusion.scheduling.CalendarView;
-import com.mindfusion.scheduling.ResourceDateEvent;
+import com.mindfusion.scheduling.ItemMouseEvent;
 import com.mindfusion.scheduling.ThemeType;
 import com.mindfusion.scheduling.WeekRangeHeaderStyle;
 import com.mindfusion.scheduling.model.Appointment;
-import com.mindfusion.scheduling.model.Resource;
+import com.mindfusion.scheduling.model.Recurrence;
+import com.mindfusion.scheduling.model.RecurrenceEnd;
 import com.mindfusion.scheduling.model.Style;
+import com.mindfusion.scheduling.model.Task;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,19 +38,20 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Calendario extends JFrame {
-    private String usuario = login.userTxt.getText(), password = login.passTxt.getText();
+    private String usuario = Login.userTxt.getText(), password = Login.passTxt.getText();
     private JPanel panelPerfil,panelPrincipal, PButton,PInfoUser, PBusqueda;
-    private JLabel title, nombre, facultad, escuela, bienvenido;
+    private JLabel title, nombre, facultad, escuela, bienvenido,ciclo;
     private JButton btnAgregar,btnCambiarCont, btnCerrarSesion;
-    public static Calendar calendario;
+    public static Calendar calendario; //Se llama desde otro JForm.
     private JComboBox cbVista;
     private JTextField txtBuscar;
     private JLabel lupa;
-    public static Estudiante user;
     
+    //Se llama desde otro JForm.
+    public static Estudiante user;
     private Tarea tareas;
     
-    public Calendario() throws ParseException{
+    public Calendario() throws ParseException, IOException{
         
         this.setLayout(null);
         this.setSize(950,950);
@@ -56,16 +59,11 @@ public class Calendario extends JFrame {
         //CALENDARIO
         calendario = new Calendar();
         calendario.setTheme(ThemeType.Standard);//tema del calendario
-        //calendario.setCurrentView(CalendarView.SingleMonth);//manejo de las vistas en el calendario
         calendario.getItemSettings().setHeaderSize(20);
-        //calendario.beginInit();
         calendario.setCurrentView(CalendarView.SingleMonth);
         calendario.getWeekRangeSettings().setHeaderStyle(EnumSet.of(WeekRangeHeaderStyle.Title));
         calendario.setButtonSize(20);
         // añadiendo popup menu o menu emergente
-        //popupMenu();
-        
-        
         
         try {
             // edito los elemento que van a ir en el panel de perfil
@@ -74,6 +72,8 @@ public class Calendario extends JFrame {
             Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
         }
         obtenerTareas();
+        obtenerCursos();
+        
         // PANELES
         
         //PANEL DEL PERFIL
@@ -91,19 +91,22 @@ public class Calendario extends JFrame {
             PInfoUser.add(nombre);
             PInfoUser.add(facultad);
             PInfoUser.add(escuela);
+            PInfoUser.add(ciclo);
             PInfoUser.add(Box.createRigidArea(new Dimension(300,100)));//definimos el ancho del panel
             PInfoUser.setBackground(Color.white);
 
             //Panel de opciones
             PButton = new JPanel();
-            PButton.setLayout(new GridLayout(4,1,10,10)); // 4 filas 1 columna
+            PButton.setLayout(new GridLayout(5,1,10,10)); // 5 filas 1 columna
 
             //padding de 10px a todos los lados
             PButton.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.white), BorderFactory.createEmptyBorder(10,10,10,10)));
             PButton.add(Box.createRigidArea(new Dimension(100,40)));// con el 40 defino el alto del boton
-            PButton.add(btnAgregar);
-            PButton.add(btnCambiarCont);
-            PButton.add(btnCerrarSesion);
+            PButton.add(btnAgregar); // 2da fila
+            PButton.add(btnCambiarCont);// 3ra fila
+            PButton.add(btnCerrarSesion);// 4ta fila
+
+            //Prueba
             PButton.setBackground(Color.white);
         
         // añadiendo componentes al Panel de perfil de usuarios
@@ -139,39 +142,91 @@ public class Calendario extends JFrame {
         panelPrincipal.add(Box.createRigidArea(new Dimension(50,50)),BorderLayout.EAST);
 
         //FRAME
-        //this.setLayout(new BoxLayout(this.getContentPane(), BoxLayout.X_AXIS));
         this.setBackground(Color.white);
-        //BorderLayout bl = new BorderLayout(10,10);
         BorderLayout bl = new BorderLayout();
         this.getContentPane().setLayout(bl);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //this.getContentPane().add(panelPerfil);
-        //this.getContentPane().add(panelPrincipal);
         this.add(panelPerfil,BorderLayout.WEST);
         this.add(panelPrincipal,BorderLayout.CENTER);
         this.setLocationRelativeTo(null);
+        
+        // CLICK EN LOS EVENTOS
+        calendario.addCalendarListener(new CalendarAdapter(){
+            @Override
+            public void itemClick(ItemMouseEvent e){
+                
+                if (e.getClicks() != 1){//un click
+                    return;
+                }
+
+                try {
+                    int id = Integer.parseInt(e.getItem().getId());
+                    if(e.getItem().getTask() != null){ // es una tarea
+                        VerEditarEliminarActividad(id);
+                    }else{ // es un curso
+                        detalleCurso(id);
+                    }
+                    
+                } catch (SQLException | IOException ex) {
+                    Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                // ACTUALIZAR CALENDARIO
+                calendario.getSchedule().getItems().removeAll(calendario.getSchedule().getItems());// elimina todos los items
+
+                try {
+                    obtenerTareas();// mostramos nuevamente
+                    obtenerCursos();
+                } catch (ParseException | IOException ex) {
+                    Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
-    public void EscogerCurso_Actividad(){
-        EscogerCurso_Actividad nt = new EscogerCurso_Actividad();
-        nt.setVisible(true);
+
+    public void NuevaActividad() throws IOException{
+        NuevaActividad nt = new NuevaActividad();
+        calendario.resetDrag();
         nt.setLocationRelativeTo(null); // para centrar ventana
+        nt.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        nt.setVisible(true);
+        
+        
+        // ACTUALIZAR CALENDARIO
+        calendario.getSchedule().getItems().removeAll(calendario.getSchedule().getItems());// elimina todos los items
+        try {
+            obtenerTareas();// mostramos nuevamente
+            obtenerCursos();
+        } catch (ParseException ex) {
+            Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    // colocar int id entre los parentesis
+    public void VerEditarEliminarActividad(int id) throws SQLException, IOException{
+        VerEditarEliminarActividad vet = new VerEditarEliminarActividad(id);
+        calendario.resetDrag();// para inhabilitar el calendario
+        vet.setLocationRelativeTo(null);
+        vet.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);// se habre como modal
+        vet.setVisible(true);
+    }
+    
+    public void detalleCurso(int id) throws SQLException, IOException{
+        DetalleCurso det = new DetalleCurso(id);
+        calendario.resetDrag();// para inhabilitar el calendario
+        det.setLocationRelativeTo(null);
+        det.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);// se habre como modal
+        det.setVisible(true);
         
     }
     
-    public void NuevoCurso(){
-        NuevoCurso nt = new NuevoCurso();
-        nt.setVisible(true);
-        nt.setLocationRelativeTo(null); // para centrar ventana
-
+    private void cerrarSesion() throws ClassNotFoundException, IOException{
+        this.setVisible(false);
+        Login lg = new Login();
+        lg.setVisible(true);
     }
-    public void NuevaActividad(){
-        NuevaActividad nt = new NuevaActividad();
-        nt.setVisible(true);
-        nt.setLocationRelativeTo(null); // para centrar ventana
-
-    }
-   
-    private void elementosPanelUsuario() throws SQLException{
+    
+    private void elementosPanelUsuario() throws SQLException, IOException{
         
         //consultamos la base de datos
         CtrlEstudiante datos = new CtrlEstudiante();
@@ -203,8 +258,15 @@ public class Calendario extends JFrame {
         escuela.setFont(letra);
         escuela.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        btnAgregar = new JButton("Agregar");
-        //btnAgregar.setSize(200,40);
+        ciclo = new JLabel(user.getCiclo());
+        ciclo.setFont(letra);
+        ciclo.setAlignmentX(Component.CENTER_ALIGNMENT);
+         
+        
+        
+        btnAgregar = new JButton("Agregar Tarea");
+        ImageIcon iconoAgregar = new ImageIcon("src/Imagenes/boton-agregar.png");
+        btnAgregar.setIcon(iconoAgregar);
         btnAgregar.setForeground(Color.white);// color del texto
         btnAgregar.setFont(letra);//definimos el tipo de letra
         btnAgregar.setBackground(new Color(41, 149, 125));//color de fondo
@@ -212,23 +274,41 @@ public class Calendario extends JFrame {
         btnAgregar.addActionListener(new java.awt.event.ActionListener(){
             @Override
             public void actionPerformed(ActionEvent e) {
-                //EscogerCurso_Actividad();
-                //NuevoTarea();
-                NuevaActividad();
+                try {
+                    NuevaActividad();
+                } catch (IOException ex) {
+                    Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         
+        //BOTON PRUEBA EDICION
+        
         btnCambiarCont = new JButton("Cambiar contraseña");
+        ImageIcon iconoEditar = new ImageIcon("src/Imagenes/editar.png");
+        btnCambiarCont.setIcon(iconoEditar);
         btnCambiarCont.setForeground(Color.white);// color del texto
         btnCambiarCont.setFont(letra);//definimos el tipo de letra
         btnCambiarCont.setBackground(new Color(32, 92, 120));//color de fondo
         
         btnCerrarSesion = new JButton("Cerrar Sesión");
+        ImageIcon iconoSalir = new ImageIcon("src/Imagenes/cerrar-sesion.png");
+        btnCerrarSesion.setIcon(iconoSalir);
         btnCerrarSesion.setForeground(Color.white);// color del texto
         btnCerrarSesion.setFont(letra);//definimos el tipo de letra
         btnCerrarSesion.setBackground(new Color(186, 19, 42));//color de fondo
-       //btnCambiarCont.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
+        btnCerrarSesion.addActionListener(new java.awt.event.ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    cerrarSesion();
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
     }
     // panel de busqueda y seleccion de vistas
     private void elementoPanelBuscar(){
@@ -253,14 +333,8 @@ public class Calendario extends JFrame {
                if("Vista Semanal".equals(cbVista.getSelectedItem().toString())){
                    calendario.setTheme(ThemeType.Light);
                    calendario.getListViewSettings().setOrientation(Orientation.Horizontal);
-                   //Font letra3 = new Font("Arial", Font.PLAIN, 16);
-                   //calendario.getListViewSettings().setHeaderFont(letra3);
-                   //calendario.getListViewSettings().setHeaderSize(50);
-                   //calendario.
-                   //calendario.setTheme(ThemeType.Standard);
                    	
                    calendario.getListViewSettings().setMainHeaderSize(25);
-                   //calendario.setButtonOffset(10);
                    calendario.getListViewSettings().setRotateHeaderTexts(false);
                    calendario.setCurrentView(CalendarView.List);
                    calendario.getListViewSettings().setNumberOfCells(7);
@@ -276,8 +350,6 @@ public class Calendario extends JFrame {
         });
         
         txtBuscar = new JTextField();
-        //txtBuscar.setMaximumSize(new Dimension(600,25));
-        //txtBuscar.setMinimumSize(new Dimension(200,25));
         lupa = new JLabel();
         lupa.setIcon(new ImageIcon(getClass().getResource("/imagenes/lupa.png")));
         
@@ -285,9 +357,6 @@ public class Calendario extends JFrame {
     }
     
     private void imagenPerfil(){
-        //ImageIcon imageIcon = new ImageIcon("/imagenes/usuario.png");
-        
-        //JLabel imagen = new JLabel(imageIcon);
         JLabel imagen = new JLabel();
         imagen.setIcon(new ImageIcon(getClass().getResource("/imagenes/usuario.png")));
         imagen.setSize(10, 156);
@@ -296,11 +365,77 @@ public class Calendario extends JFrame {
         img.add(imagen);
         PInfoUser.add(img);
     }
-    private void obtenerTareas() throws ParseException{
+    
+    private void obtenerTareas() throws ParseException, IOException{
         Connection objConexion = ConexionBD.conectar();
-        String sql = "SELECT * FROM tareas WHERE id_estudiante ='" + user.getId() + "'";
-        ResultSet rs =  null;
-        PreparedStatement ps = null;
+        
+        Date fecha;
+        Date fechaFin;
+        
+        SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        String sql = "SELECT * FROM tareas WHERE id_estudiante =?";
+        int r,g,b;
+        String fechatxt = "";
+        int cont = 0;
+        try(PreparedStatement ps = objConexion.prepareStatement(sql)){
+            
+            ps.setString(1, ""+user.getId());
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next()){
+                Appointment item = new Appointment();
+                Style estilo = item.getStyle();
+                estilo.setLineColor(Colors.Black);
+                estilo.setHeaderTextColor(Colors.Black);
+                item.setId(rs.getString("id_tarea"));// pasamos el id al item
+                item.setHeaderText(rs.getString("titulo"));
+                
+                item.setDescriptionText(rs.getString("descripcion"));
+                
+                fechatxt = rs.getString("fecha").substring(8, 10) + "/" + rs.getString("fecha").substring(5, 7) + "/" + rs.getString("fecha").substring(0, 4);
+                fecha = formato.parse(fechatxt + " " + rs.getString("hora_inicio"));
+                DateTime primerDia = new DateTime(fecha);
+                
+                fechaFin = formato.parse(fechatxt + " " + rs.getString("hora_fin"));
+                
+                DateTime finDia = new DateTime(fechaFin);
+                
+                item.setStartTime(primerDia); // dia de hoy a las 12
+                item.setEndTime(finDia);
+                
+                r = Integer.parseInt(rs.getString("color_r"));
+                g = Integer.parseInt(rs.getString("color_g"));
+                b = Integer.parseInt(rs.getString("color_b"));
+                estilo.setBrush(new SolidBrush(new Color(r,g,b))); //color de fondo      
+                
+                Task tarea = new Task(); // como distintivo de las tareas le agrego un task
+                tarea.setName("tarea");
+                item.setTask(tarea);
+                
+                //AGREGAMOS RECURRENCIA
+                Recurrence re = new Recurrence();
+                re.setWeeks(1);// 1 vez por semana 
+                re.setStartDate(primerDia);//desde este dia es que realiza la recurrencia
+
+                re.setDaysOfWeek(EnumSet.of(primerDia.getDayOfWeek()));// pasamos el dia de la semana que tiene la fecha primerDia, en este caso es martes, por lo que se repite cada martes
+                
+                re.setNumOccurrences(Integer.parseInt(rs.getString("repeticiones"))); // numero de ocurrencias
+                re.setRecurrenceEnd(RecurrenceEnd.NumOccurrences); // asignamos el numero de ocurrencias
+                
+                item.setRecurrence(re);
+                
+                // AGREGAMOS EL ITEM AL CALENDARIO
+                calendario.getSchedule().getItems().add(item);
+                cont++;
+            }
+        }catch (SQLException e){
+            System.out.println("uno un problema...");
+        }
+    }
+    
+    private void obtenerCursos() throws ParseException, IOException{
+        Connection objConexion = ConexionBD.conectar();
+        String sql = "SELECT * FROM curso WHERE ciclo =?";
         
         Date fecha;
         Date fechaFin;
@@ -310,53 +445,54 @@ public class Calendario extends JFrame {
         int r,g,b;
         String fechatxt = "";
         int cont = 0;
-        try{
-
-            ps = objConexion.prepareStatement(sql);
-            rs = ps.executeQuery();
+        try(PreparedStatement ps = objConexion.prepareStatement(sql)){
+            
+            ps.setString(1, ""+user.getCiclo());
+            ResultSet rs = ps.executeQuery();
             while(rs.next()){
                 Appointment item = new Appointment();
                 Style estilo = item.getStyle();
                 estilo.setLineColor(Colors.Black);
                 //estilo.setHeaderFont(fuente);
                 estilo.setHeaderTextColor(Colors.Black);
+                item.setId(rs.getString("id_curso"));// pasamos el id al item
+                item.setHeaderText(rs.getString("nombre"));
                 
-                item.setHeaderText(rs.getString("titulo"));
+                item.setDescriptionText("Docente: " + rs.getString("docente") + "\nPlan: " + rs.getString("plan") + "\nPeriodo academico: " + rs.getString("periodo_academico"));
                 
-                item.setDescriptionText(rs.getString("descripcion"));
-                
-                fechatxt = rs.getString("fecha").substring(8, 10) + "/" + rs.getString("fecha").substring(5, 7) + "/" + rs.getString("fecha").substring(0, 4);
+                fechatxt = rs.getString("fecha_inicio").substring(8, 10) + "/" + rs.getString("fecha_inicio").substring(5, 7) + "/" + rs.getString("fecha_inicio").substring(0, 4);
                 fecha = formato.parse(fechatxt + " " + rs.getString("hora_inicio"));
                 DateTime primerDia = new DateTime(fecha);
                 
-                //fechatxtfin = rs.getString("fecha").substring(8, 9) + rs.getString("fecha").substring(5, 6) + "/" + rs.getString("fecha").substring(0, 3);
                 fechaFin = formato.parse(fechatxt + " " + rs.getString("hora_fin"));
-                //System.out.println(fechaFin);
                 DateTime finDia = new DateTime(fechaFin);
                 
                 item.setStartTime(primerDia); // dia de hoy a las 12
                 item.setEndTime(finDia);
-                //System.out.println(fechaFin);
-                r = Integer.parseInt(rs.getString("color_r"));
-                g = Integer.parseInt(rs.getString("color_g"));
-                b = Integer.parseInt(rs.getString("color_b"));
-                estilo.setBrush(new SolidBrush(new Color(r,g,b))); //color de fondo
                 
-                estilo.setLineColor(Colors.Black);
-                //estilo.setFillColor(new Color(75, 144, 233));
-
-                //estilo.setHeaderFont(fuente);
-                estilo.setHeaderTextColor(Colors.Black);
+                // bloquemos el item
+                item.setAllowMove(false);
+                item.setLocked(true);
                 
+                // insertamos el item
                 calendario.getSchedule().getItems().add(item);
+                
+                Recurrence re = new Recurrence();
+                re.setWeeks(1);// 1 vez por semana 
+                re.setStartDate(primerDia);//desde este dia es que realiza la recurrencia
+
+                re.setDaysOfWeek(EnumSet.of(primerDia.getDayOfWeek()));// pasamos el dia de la semana que tiene la fecha primerDia, en este caso es martes, por lo que se repite cada martes
+                
+                re.setNumOccurrences(Integer.parseInt(rs.getString("cantidad_semanas"))); // numero de ocurrencias
+                re.setRecurrenceEnd(RecurrenceEnd.NumOccurrences); // asignamos el numero de ocurrencias
+                
+                item.setRecurrence(re);
+                
+                
                 cont++;
             }
         }catch (SQLException e){
-            System.out.println("uno un problema...");
+            System.out.println(e.getMessage());
         }
     }
-/*
-    private void clickDerechoItem(){
-        ItemMouseEvent e;
-    }*/
 }

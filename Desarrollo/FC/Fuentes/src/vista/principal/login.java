@@ -1,24 +1,23 @@
 package vista.principal;
 
-import Controladores.TextPrompt;
-//import Controladores.CtrlLogin;
-import Controladores.CtrlEstudiante;
-import javax.print.DocFlavor;
+import controladores.TextPrompt;
+import controladores.CtrlEstudiante;
 import vista.calendario.Calendario;
 import javax.swing.JOptionPane;
-import vista.registro.registro;
-import JDBC.ConexionBD;
+import vista.registro.Registro;
+import jdbc.ConexionBD;
 import java.awt.Color;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class login extends javax.swing.JFrame {
-    private panel_control panel_control;
+public class Login extends javax.swing.JFrame {
+    private Panel_control panel_control;
     private Object pc;
-    private registro v = new registro();
-    public login() throws ClassNotFoundException {
+    private Registro v = new Registro();
+    public Login() throws ClassNotFoundException, IOException {
         initComponents();
         this.setLocationRelativeTo(null);
         ConexionBD objConexion = new ConexionBD();
@@ -221,12 +220,16 @@ public class login extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void userTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_userTxtActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_userTxtActionPerformed
 
     private void ingresarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ingresarMouseClicked
-        //JOptionPane.showMessageDialog(this,"Intento de login con los datos:\nUsuario: "+ userTxt.getText()+ "\ncontraseña: "+ String.valueOf(passTxt.getPassword()),"Login", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        CtrlEstudiante verBD = new CtrlEstudiante();
+        CtrlEstudiante verBD = null;
+        try {
+            verBD = new CtrlEstudiante();
+        } catch (IOException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
         try {
             boolean verificar = verBD.verificarLogin(userTxt.getText(),passTxt.getText());
             
@@ -234,8 +237,6 @@ public class login extends javax.swing.JFrame {
                 // si el usuario existe
                 JOptionPane.showMessageDialog(this, "Usuario logeado");
                 Calendario calendar = new Calendario();
-                //calendar.usuario = userTxt.getText();
-                //calendar.password = passTxt.getText();
                 calendar.setVisible(true);
                 this.setVisible(false);
                 
@@ -244,18 +245,13 @@ public class login extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "Usuario no existe");
             }
             
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(login.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(login.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(login.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | SQLException | ParseException | IOException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
         
     }//GEN-LAST:event_ingresarMouseClicked
 
     private void JlRegistrarseMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_JlRegistrarseMouseClicked
-        
         v.setVisible(true);
     }//GEN-LAST:event_JlRegistrarseMouseClicked
 
@@ -264,8 +260,7 @@ public class login extends javax.swing.JFrame {
     }//GEN-LAST:event_exitBtnMouseClicked
 
     private void exitBtnMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exitBtnMouseEntered
-        // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_exitBtnMouseEntered
 
     private void exitTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exitTxtMouseClicked
@@ -274,44 +269,23 @@ public class login extends javax.swing.JFrame {
     }//GEN-LAST:event_exitTxtMouseClicked
 
     private void exitTxtMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exitTxtMouseEntered
-        // TODO add your handling code here:
         exitBtn.setBackground(Color.red);
     }//GEN-LAST:event_exitTxtMouseEntered
 
     private void exitTxtMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exitTxtMouseExited
-        // TODO add your handling code here:
         exitBtn.setBackground(Color.white);
     }//GEN-LAST:event_exitTxtMouseExited
 
     private void userTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_userTxtMouseClicked
-        // TODO add your handling code here:
-        
+
     }//GEN-LAST:event_userTxtMouseClicked
 
     private void userTxtMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_userTxtMousePressed
-        // TODO add your handling code here:
-        /*if (userTxt.getText().equals("Ingrese su nombre de usuario")) {
-            userTxt.setText("");
-            userTxt.setForeground(Color.black);
-        }
-        if (String.valueOf(passTxt.getPassword()).isEmpty()){
-            passTxt.setText("********");
-            userTxt.setForeground(Color.gray);
-            
-        }*/
+
     }//GEN-LAST:event_userTxtMousePressed
 
     private void passTxtMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_passTxtMousePressed
-        // TODO add your handling code here:
-        /*if (String.valueOf(passTxt.getPassword()).equals("********")) {
-            passTxt.setText("");
-            passTxt.setForeground(Color.black);
-        }
-        if (userTxt.getText().isEmpty()){
-            passTxt.setText("********");
-            userTxt.setForeground(Color.gray);
-            
-        }*/
+
     }//GEN-LAST:event_passTxtMousePressed
 
     private void ingresarMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ingresarMousePressed
@@ -337,21 +311,15 @@ public class login extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new login().setVisible(true);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(login.class.getName()).log(Level.SEVERE, null, ex);
+                    new Login().setVisible(true);
+                } catch (ClassNotFoundException | IOException ex) {
+                    Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });

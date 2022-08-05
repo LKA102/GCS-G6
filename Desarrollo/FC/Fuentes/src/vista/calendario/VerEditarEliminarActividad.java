@@ -1,36 +1,51 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package vista.calendario;
 
-import Controladores.CtrlEstudiante;
-import Entidades.Tarea;
+import controladores.CtrlEstudiante;
+import entidades.Tarea;
 import com.mindfusion.common.DateTime;
 import com.mindfusion.drawing.Colors;
 import com.mindfusion.drawing.SolidBrush;
-import com.mindfusion.drawing.TextAlignment;
-import static com.mindfusion.drawing.TextAlignment.TopCenter;
-import static com.mindfusion.scheduling.Alignment.Center;
 import com.mindfusion.scheduling.model.Appointment;
 import com.mindfusion.scheduling.model.Style;
 import java.awt.Color;
 import java.awt.Font;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JColorChooser;
-import java.time.LocalDate;
 
-public class VerEditarEliminarActividad extends javax.swing.JFrame {
+public class VerEditarEliminarActividad extends javax.swing.JDialog {
     public static Appointment app;
+    public Tarea obj_tarea;
+    public static int prueba = 0;
 
-    public VerEditarEliminarActividad() {
+    public VerEditarEliminarActividad(int id) throws SQLException, IOException {
         initComponents();
+        CtrlEstudiante dato = new CtrlEstudiante();
+        prueba = id;
+        obj_tarea = new Tarea();
+        obj_tarea = dato.obtenerDatosTarea(id);
+        txtTitulo.setText(obj_tarea.getTitulo());
+        TxtDescripcion.setText(obj_tarea.getDescripcion());
+        txtDia.setText(String.valueOf(obj_tarea.getDia()));
+
+        cmbMes.setSelectedItem(mess());
+        cmbAnio.setSelectedItem(String.valueOf(obj_tarea.getAnio()));
+        
+        Color co = new Color(obj_tarea.getR(),obj_tarea.getG(),obj_tarea.getB());
+        btnColor.setBackground(co);
+        
+        txtHoraInicio.setText(String.valueOf(obj_tarea.getHoraInicio()));
+        txtMinutoInicio.setText(String.valueOf(obj_tarea.getMinutoInicio()));
+        txtHoraFin.setText(String.valueOf(obj_tarea.getHoraFin()));
+        txtMinutoFin.setText(String.valueOf(obj_tarea.getMinutoFin()));
+        
+        txtRepeticion.setText(String.valueOf(obj_tarea.getRepeticiones()));
+
     }
 
     @SuppressWarnings("unchecked")
@@ -41,32 +56,31 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
         jProgressBar1 = new javax.swing.JProgressBar();
         jScrollPane1 = new javax.swing.JScrollPane();
         TxtDescripcion = new javax.swing.JTextArea();
-        BtnDescartar = new javax.swing.JButton();
-        BtnGuardar = new javax.swing.JButton();
+        btnDescartar = new javax.swing.JButton();
+        btnGuardar = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
-        BtnColor = new javax.swing.JButton();
+        btnColor = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        TxtHoraInicio = new javax.swing.JTextField();
-        TxtMinutoInicio = new javax.swing.JTextField();
+        txtHoraInicio = new javax.swing.JTextField();
+        txtMinutoInicio = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        TxtDia = new javax.swing.JTextField();
-        CmbMes = new javax.swing.JComboBox<>();
-        CmbAnio = new javax.swing.JComboBox<>();
-        TxtTitulo = new javax.swing.JTextField();
+        txtDia = new javax.swing.JTextField();
+        cmbMes = new javax.swing.JComboBox<>();
+        cmbAnio = new javax.swing.JComboBox<>();
+        txtTitulo = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        TxtHoraFin = new javax.swing.JTextField();
-        jLabel7 = new javax.swing.JLabel();
-        TxtRepeticion = new javax.swing.JTextField();
+        txtHoraFin = new javax.swing.JTextField();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        TxtMinutoFin = new javax.swing.JTextField();
+        txtMinutoFin = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
+        txtRepeticion = new javax.swing.JTextField();
+        jLabel7 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
 
         TxtDescripcion.setColumns(20);
@@ -74,36 +88,38 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
         TxtDescripcion.setRows(5);
         jScrollPane1.setViewportView(TxtDescripcion);
 
-        BtnDescartar.setBackground(new java.awt.Color(238, 88, 115));
-        BtnDescartar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        BtnDescartar.setText("Descartar");
-        BtnDescartar.addActionListener(new java.awt.event.ActionListener() {
+        btnDescartar.setBackground(new java.awt.Color(238, 88, 115));
+        btnDescartar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnDescartar.setText("Eliminar");
+        btnDescartar.setBorderPainted(false);
+        btnDescartar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnDescartarActionPerformed(evt);
+                BtnEliminarActionPerformed(evt);
             }
         });
 
-        BtnGuardar.setBackground(new java.awt.Color(60, 154, 156));
-        BtnGuardar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        BtnGuardar.setText("Guardar");
-        BtnGuardar.addActionListener(new java.awt.event.ActionListener() {
+        btnGuardar.setBackground(new java.awt.Color(60, 154, 156));
+        btnGuardar.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        btnGuardar.setText("Editar");
+        btnGuardar.setBorderPainted(false);
+        btnGuardar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnGuardarActionPerformed(evt);
+                BtnEditarActionPerformed(evt);
             }
         });
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel8.setText("Descripción");
 
-        BtnColor.setBackground(new java.awt.Color(255, 255, 255));
-        BtnColor.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+        btnColor.setBackground(new java.awt.Color(255, 255, 255));
+        btnColor.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseMoved(java.awt.event.MouseEvent evt) {
-                BtnColorMouseMoved(evt);
+                btnColorMouseMoved(evt);
             }
         });
-        BtnColor.addActionListener(new java.awt.event.ActionListener() {
+        btnColor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BtnColorActionPerformed(evt);
+                btnColorActionPerformed(evt);
             }
         });
 
@@ -116,31 +132,31 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
         jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel3.setText("Fecha (DD/MM/AA)");
 
-        TxtHoraInicio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtHoraInicio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        TxtMinutoInicio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtMinutoInicio.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel2.setText("Titulo");
 
-        TxtDia.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtDia.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
-        CmbMes.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        CmbMes.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" }));
+        cmbMes.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cmbMes.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre" }));
 
-        CmbAnio.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        CmbAnio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
-        CmbAnio.addActionListener(new java.awt.event.ActionListener() {
+        cmbAnio.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        cmbAnio.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
+        cmbAnio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CmbAnioActionPerformed(evt);
+                cmbAnioActionPerformed(evt);
             }
         });
 
-        TxtTitulo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
-        TxtTitulo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        TxtTitulo.addActionListener(new java.awt.event.ActionListener() {
+        txtTitulo.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
+        txtTitulo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtTitulo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TxtTituloActionPerformed(evt);
+                txtTituloActionPerformed(evt);
             }
         });
 
@@ -152,20 +168,10 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
         jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel5.setText("Hora de fin");
 
-        TxtHoraFin.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        TxtHoraFin.addActionListener(new java.awt.event.ActionListener() {
+        txtHoraFin.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtHoraFin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TxtHoraFinActionPerformed(evt);
-            }
-        });
-
-        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
-        jLabel7.setText("Repetición semanal");
-
-        TxtRepeticion.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        TxtRepeticion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TxtRepeticionActionPerformed(evt);
+                txtHoraFinActionPerformed(evt);
             }
         });
 
@@ -175,7 +181,7 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
         jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel10.setText(":");
 
-        TxtMinutoFin.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtMinutoFin.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         jLabel11.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel11.setText("/");
@@ -183,29 +189,49 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
         jLabel12.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel12.setText("/");
 
+        txtRepeticion.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        txtRepeticion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtRepeticionActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        jLabel7.setText("Repetición semanal");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
+                .addGap(36, 36, 36)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel6)
+                            .addComponent(jLabel8)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(94, 94, 94)
+                                .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(133, 133, 133)
+                                .addComponent(btnDescartar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel5))
+                        .addGap(59, 59, 59)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtTitulo)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel5))
-                                .addGap(59, 59, 59)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(TxtTitulo)
                                     .addGroup(layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                            .addComponent(TxtHoraInicio)
-                                            .addComponent(TxtDia, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addComponent(txtHoraInicio)
+                                            .addComponent(txtDia, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addGroup(layout.createSequentialGroup()
                                                 .addGap(6, 6, 6)
@@ -215,35 +241,33 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
                                                 .addComponent(jLabel11)))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(TxtMinutoInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(txtMinutoInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addGroup(layout.createSequentialGroup()
-                                                .addComponent(CmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(cmbMes, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(5, 5, 5)
                                                 .addComponent(jLabel12)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(CmbAnio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                .addComponent(cmbAnio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(TxtHoraFin, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtHoraFin, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(jLabel10)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(TxtMinutoFin, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel8)
-                                    .addComponent(jLabel7)
-                                    .addComponent(jLabel6))
-                                .addGap(63, 63, 63)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(BtnColor, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(TxtRepeticion, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                        .addComponent(txtMinutoFin, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap(40, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(133, 133, 133)
-                        .addComponent(BtnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(134, 134, 134)
-                        .addComponent(BtnDescartar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(40, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(btnColor, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(jLabel7)
+                                    .addGap(63, 63, 63)
+                                    .addComponent(txtRepeticion, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(229, 229, 229)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -253,194 +277,179 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(TxtTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(TxtDia, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(CmbMes)
-                    .addComponent(CmbAnio)
+                    .addComponent(txtDia, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cmbMes)
+                    .addComponent(cmbAnio)
                     .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel4)
-                        .addComponent(TxtHoraInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(TxtMinutoInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtHoraInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtMinutoInicio, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(TxtHoraFin, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addComponent(TxtMinutoFin, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(17, 17, 17)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel7)
-                            .addComponent(TxtRepeticion, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(BtnColor, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(txtHoraFin, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtMinutoFin, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel7)
+                    .addComponent(txtRepeticion, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnColor, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel8)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(30, 30, 30)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(BtnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(BtnDescartar, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(40, 40, 40))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel8)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(125, 125, 125))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnDescartar, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(38, 38, 38))))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void BtnColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnColorActionPerformed
+    private void btnColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnColorActionPerformed
         JColorChooser colorChooser = new JColorChooser();
 
         Color color = JColorChooser.showDialog(null, "Seleccione el color de la actividad", Color.black);
 
-        //jButton2.setForeground(color); //color de texto
-        BtnColor.setBackground(color);
-    }//GEN-LAST:event_BtnColorActionPerformed
+        btnColor.setBackground(color);
+    }//GEN-LAST:event_btnColorActionPerformed
 
-    private void BtnDescartarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnDescartarActionPerformed
-        this.setVisible(false);
-    }//GEN-LAST:event_BtnDescartarActionPerformed
+    private void txtTituloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTituloActionPerformed
 
-    private void BtnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnGuardarActionPerformed
+    }//GEN-LAST:event_txtTituloActionPerformed
 
-        //int mes = mes();
-        //System.out.println(primerDia.toString());
+    private void cmbAnioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbAnioActionPerformed
 
+    }//GEN-LAST:event_cmbAnioActionPerformed
+
+    private void btnColorMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnColorMouseMoved
+
+    }//GEN-LAST:event_btnColorMouseMoved
+
+    private void txtHoraFinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHoraFinActionPerformed
+
+    }//GEN-LAST:event_txtHoraFinActionPerformed
+
+    private void BtnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnEditarActionPerformed
+       
+        
+        // Codigo Editar
         this.app = new Appointment();
-        String titulo = TxtTitulo.getText();
+        String titulo = txtTitulo.getText();
         app.setHeaderText(titulo); // titulo
 
-        //String prioridad = PrioridadCombo.getSelectedItem().toString() + "\n";
-        //String curso = CursoCombo.getSelectedItem().toString() + "\n";
         String Descripcion = TxtDescripcion.getText();
         app.setDescriptionText(Descripcion);
 
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm");
         Date fecha;
         Date fechaFin;
-        int horas = Integer.parseInt(TxtHoraInicio.getText());
-        int contRep=1;//repeticiones semanales
-        int repeticiones = Integer.parseInt(TxtRepeticion.getText());
+        int horas = Integer.parseInt(txtHoraInicio.getText());
         
         try {
-            fecha = formato.parse(TxtDia.getText() + "/" + mes() + "/" + CmbAnio.getSelectedItem().toString() + " " + TxtHoraInicio.getText() + ":" + TxtMinutoInicio.getText());
+            fecha = formato.parse(txtDia.getText() + "/" + mes() + "/" + cmbAnio.getSelectedItem().toString() + " " + txtHoraInicio.getText() + ":" + txtMinutoInicio.getText());
             DateTime primerDia = new DateTime(fecha); 
              
-            fechaFin = formato.parse(TxtDia.getText() + "/" + mes() + "/" + CmbAnio.getSelectedItem().toString() + " " + TxtHoraFin.getText() + ":" + TxtMinutoFin.getText());
+            fechaFin = formato.parse(txtDia.getText() + "/" + mes() + "/" + cmbAnio.getSelectedItem().toString() + " " + txtHoraFin.getText() + ":" + txtMinutoFin.getText());
             DateTime finDia = new DateTime(fechaFin);
-            //app.setAllowChangeStart(false);//no se modifica la hora de inicio
-            //app.setAllowChangeEnd(false); //no se modifica la hora de termino
+            
             app.setLocked(false);//no se modifica el item
 
             app.setStartTime(primerDia); // dia de hoy a las 12
             app.setEndTime(finDia);// hasta las 4 horas (de 0 a 5)(no se si suma 5 horas o va a la hora 5)
         } catch (ParseException ex) {
-            Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(NuevaActividad.class.getName()).log(Level.SEVERE, null, ex);
         }
         Font fuente=new Font("TimesRoman", Font.BOLD, 12);
         Style estilo = app.getStyle();
-        //estilo.setTextColor(new Color(0xFF,0x80,0x80,0x80));
         
         estilo.setLineColor(Colors.Black);
-        //estilo.setFillColor(new Color(75, 144, 233));
 
         estilo.setHeaderFont(fuente);
         estilo.setHeaderTextColor(Colors.Black);
-        estilo.setBrush(new SolidBrush(BtnColor.getBackground())); //color de fondo
+        estilo.setBrush(new SolidBrush(btnColor.getBackground())); //color de fondo
         
-        //Calendario.calendario.getItemSettings().getSelectedItemStyle().setLineColor(BtnColor.getBackground());
-        Calendario.calendario.getSchedule().getItems().add(app);
+       Calendario.calendario.getSchedule().getItems().add(app);//Agrega al calendario.
         this.setVisible(false);
         
-        //Insertamos en la base de datos
+        //Editar en la base de datos
         Tarea ta = new Tarea();
-        ta.setTitulo(TxtTitulo.getText());
+        ta.setTitulo(txtTitulo.getText());
         ta.setDescripcion(TxtDescripcion.getText());
         
-        ta.setAnio(Integer.parseInt(CmbAnio.getSelectedItem().toString()));
+        ta.setAnio(Integer.parseInt(cmbAnio.getSelectedItem().toString()));
         ta.setMes(mes());
-        ta.setDia(Integer.parseInt(TxtDia.getText()));
+        ta.setDia(Integer.parseInt(txtDia.getText()));
         
-        ta.setHoraInicio(Integer.parseInt(TxtHoraInicio.getText()));
-        ta.setMinutoInicio(Integer.parseInt(TxtMinutoInicio.getText()));
+        ta.setHoraInicio(Integer.parseInt(txtHoraInicio.getText()));
+        ta.setMinutoInicio(Integer.parseInt(txtMinutoInicio.getText()));
         
-        ta.setHoraFin(Integer.parseInt(TxtHoraFin.getText()));
-        ta.setMinutoFin(Integer.parseInt(TxtMinutoFin.getText()));
+        ta.setHoraFin(Integer.parseInt(txtHoraFin.getText()));
+        ta.setMinutoFin(Integer.parseInt(txtMinutoFin.getText()));
         
-        ta.setR(BtnColor.getBackground().getRed());
-        ta.setG(BtnColor.getBackground().getGreen());
-        ta.setB(BtnColor.getBackground().getBlue());
+        ta.setR(btnColor.getBackground().getRed());
+        ta.setG(btnColor.getBackground().getGreen());
+        ta.setB(btnColor.getBackground().getBlue());
         
         ta.setCodEstudiante(Calendario.user.getId());
-        CtrlEstudiante dato = new CtrlEstudiante();
+        ta.setRepeticiones(Integer.parseInt(txtRepeticion.getText()));
+        ta.setid(prueba);
+        CtrlEstudiante dato = null;
+        try {
+            dato = new CtrlEstudiante();
+        } catch (IOException ex) {
+            Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         
         try {//primera 
-            dato.insertarTarea(ta);
+            dato.editarTarea(ta);
         } catch (SQLException ex) {
+            Logger.getLogger(NuevaActividad.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_BtnEditarActionPerformed
+
+    private void BtnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BtnEliminarActionPerformed
+        // Codigo Eliminar
+        CtrlEstudiante dato = null;
+        try {
+            dato = new CtrlEstudiante();
+        } catch (IOException ex) {
             Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(Level.SEVERE, null, ex);
         }
-        if(contRep != repeticiones){
-            //aumentar 7 dias y registrar
-            String mesDosDigitos = mes()+"";    //correccion de formato
-            if (mes()<10){
-                mesDosDigitos= "0"+mesDosDigitos;
-            }
-            LocalDate sigFecha = LocalDate.parse(CmbAnio.getSelectedItem().toString() + "-" +mesDosDigitos+ "-" + TxtDia.getText());
-            while(contRep<repeticiones)  {
-                try {
-                    sigFecha = sigFecha.plusDays(7);
-                    int sigDia = sigFecha.getDayOfMonth();
-                    int sigMes = sigFecha.getMonthValue();
-                    int sigAnio = sigFecha.getYear();
-                    ta.setAnio(sigAnio);
-                    ta.setMes(sigMes);
-                    ta.setDia(sigDia);
-                    dato.insertarTarea(ta);
-                    contRep++;
-                } catch (SQLException ex) {
-                    Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        
-        }; 
-        
-    }//GEN-LAST:event_BtnGuardarActionPerformed
+        try {
+            dato.eliminarTarea(obj_tarea.getid());
+        } catch (SQLException ex) {
+            Logger.getLogger(NuevaActividad.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        this.setVisible(false);
+    }//GEN-LAST:event_BtnEliminarActionPerformed
 
-    private void TxtTituloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TxtTituloActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TxtTituloActionPerformed
+    private void txtRepeticionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRepeticionActionPerformed
 
-    private void CmbAnioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CmbAnioActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_CmbAnioActionPerformed
-
-    private void BtnColorMouseMoved(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BtnColorMouseMoved
-        // TODO add your handling code here:
-    }//GEN-LAST:event_BtnColorMouseMoved
-
-    private void TxtRepeticionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TxtRepeticionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TxtRepeticionActionPerformed
-
-    private void TxtHoraFinActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TxtHoraFinActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TxtHoraFinActionPerformed
+    }//GEN-LAST:event_txtRepeticionActionPerformed
     
     private int mes(){ // retorna el numero del mes
-        String mes = CmbMes.getSelectedItem().toString();
+        String mes = cmbMes.getSelectedItem().toString();
         String[] meses = {"Enero","Febrero","Marzo","Abril",
                           "Mayo","Junio","Julio","Agosto",
                           "Septiembre","Octubre","Noviembre","Diciembre"};
@@ -450,6 +459,14 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
             }
         }
         return 1;
+    }
+    
+    private String mess(){//retorna el nombre del mes
+        String[] meses = {"Enero","Febrero","Marzo","Abril",
+                          "Mayo","Junio","Julio","Agosto",
+                          "Septiembre","Octubre","Noviembre","Diciembre"};
+
+        return meses[obj_tarea.getMes()-1];
     }
 
     public static void main(String args[]) {
@@ -480,25 +497,22 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new VerEditarEliminarActividad().setVisible(true);
+                try {
+                    new VerEditarEliminarActividad(prueba).setVisible(true);
+                } catch (SQLException | IOException ex) {
+                    Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton BtnColor;
-    private javax.swing.JButton BtnDescartar;
-    private javax.swing.JButton BtnGuardar;
-    private javax.swing.JComboBox<String> CmbAnio;
-    private javax.swing.JComboBox<String> CmbMes;
     private javax.swing.JTextArea TxtDescripcion;
-    private javax.swing.JTextField TxtDia;
-    private javax.swing.JTextField TxtHoraFin;
-    private javax.swing.JTextField TxtHoraInicio;
-    private javax.swing.JTextField TxtMinutoFin;
-    private javax.swing.JTextField TxtMinutoInicio;
-    private javax.swing.JTextField TxtRepeticion;
-    private javax.swing.JTextField TxtTitulo;
+    private javax.swing.JButton btnColor;
+    private javax.swing.JButton btnDescartar;
+    private javax.swing.JButton btnGuardar;
+    private javax.swing.JComboBox<String> cmbAnio;
+    private javax.swing.JComboBox<String> cmbMes;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -514,5 +528,12 @@ public class VerEditarEliminarActividad extends javax.swing.JFrame {
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTextField txtDia;
+    private javax.swing.JTextField txtHoraFin;
+    private javax.swing.JTextField txtHoraInicio;
+    private javax.swing.JTextField txtMinutoFin;
+    private javax.swing.JTextField txtMinutoInicio;
+    private javax.swing.JTextField txtRepeticion;
+    private javax.swing.JTextField txtTitulo;
     // End of variables declaration//GEN-END:variables
 }

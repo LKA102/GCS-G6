@@ -1,6 +1,7 @@
-package Entidades;
+package entidades;
 
 public class Tarea {
+    int id;
     String titulo;
     int mes;
     int dia;
@@ -11,6 +12,16 @@ public class Tarea {
     
     int r,g,b;
     int codEstudiante;
+    
+    int repeticiones;
+
+    public int getRepeticiones() {
+        return repeticiones;
+    }
+
+    public void setRepeticiones(int repeticiones) {
+        this.repeticiones = repeticiones;
+    }
 
     public int getCodEstudiante() {
         return codEstudiante;
@@ -24,6 +35,14 @@ public class Tarea {
     public Tarea() {
     }
 
+    public int getid() {
+        return id;
+    }
+
+    public void setid(int id) {
+        this.id = id;
+    }
+    
     public String getTitulo() {
         return titulo;
     }

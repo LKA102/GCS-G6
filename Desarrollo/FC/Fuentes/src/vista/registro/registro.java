@@ -1,18 +1,22 @@
 package vista.registro;
 
-import Controladores.CtrlEstudiante;
-import Controladores.TextPrompt;
-import Entidades.Estudiante;
-import ExcepcionesPropias.DatoNoValido;
+import controladores.CtrlEstudiante;
+import controladores.TextPrompt;
+import entidades.Estudiante;
+import excepcionesPropias.DatoNoValido;
 import java.awt.Color;
+import java.io.IOException;
 import javax.swing.JOptionPane;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class registro extends javax.swing.JFrame {
+public class Registro extends javax.swing.JFrame {
 
-    CtrlEstudiante ctrlEstudiante = new CtrlEstudiante();
+    CtrlEstudiante ctrlEstudiante;
     
-    public registro() {
+    public Registro() throws IOException {
+        this.ctrlEstudiante = new CtrlEstudiante();
         initComponents();
         this.setLocationRelativeTo(null);
         
@@ -27,15 +31,11 @@ public class registro extends javax.swing.JFrame {
         passTxt.setText("");
         escuelaCombo.setSelectedIndex(0);
         facultadCombo.setSelectedIndex(0);
-        planCombo.setSelectedIndex(0);
+        planCombo2.setSelectedIndex(0);
+        planComboCiclo.setSelectedIndex(0);
         
     }
     @SuppressWarnings("unchecked")
-    /*private void limpiar(){
-        userTxt.setText("");
-        correoTxt.setText("");
-        passTxt.setText("");
-    }*/
    
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -61,12 +61,15 @@ public class registro extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jSeparator4 = new javax.swing.JSeparator();
         jSeparator5 = new javax.swing.JSeparator();
-        jLabel10 = new javax.swing.JLabel();
+        jLabelciclo = new javax.swing.JLabel();
         jSeparator6 = new javax.swing.JSeparator();
         jLabel11 = new javax.swing.JLabel();
         facultadCombo = new javax.swing.JComboBox<>();
         escuelaCombo = new javax.swing.JComboBox<>();
-        planCombo = new javax.swing.JComboBox<>();
+        jLabel12 = new javax.swing.JLabel();
+        planComboCiclo = new javax.swing.JComboBox<>();
+        jSeparator7 = new javax.swing.JSeparator();
+        planCombo2 = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -93,7 +96,7 @@ public class registro extends javax.swing.JFrame {
         exitTxt.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         exitTxt.setText("X");
         exitTxt.setToolTipText("");
-        exitTxt.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        exitTxt.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         exitTxt.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 exitTxtMouseClicked(evt);
@@ -104,7 +107,7 @@ public class registro extends javax.swing.JFrame {
         exitBtn.setLayout(exitBtnLayout);
         exitBtnLayout.setHorizontalGroup(
             exitBtnLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(exitTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
+            .addComponent(exitTxt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         exitBtnLayout.setVerticalGroup(
             exitBtnLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -153,7 +156,7 @@ public class registro extends javax.swing.JFrame {
             }
         });
         jPanel3.add(correoTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, 250, 20));
-        jPanel3.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 270, 251, 10));
+        jPanel3.add(jSeparator2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 340, 251, 10));
         jPanel3.add(jSeparator3, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 270, 251, 10));
 
         jPanel2.setBackground(new java.awt.Color(40, 158, 242));
@@ -166,7 +169,7 @@ public class registro extends javax.swing.JFrame {
         guardar.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         guardar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         guardar.setText("Registrarse");
-        guardar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        guardar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         guardar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 guardarMouseClicked(evt);
@@ -177,11 +180,11 @@ public class registro extends javax.swing.JFrame {
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(guardar, javax.swing.GroupLayout.DEFAULT_SIZE, 110, Short.MAX_VALUE)
+            .addComponent(guardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(guardar, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+            .addComponent(guardar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         jPanel3.add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 400, 110, 40));
@@ -204,7 +207,7 @@ public class registro extends javax.swing.JFrame {
         Regresar.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         Regresar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         Regresar.setText("Regresar");
-        Regresar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        Regresar.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         Regresar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 RegresarMouseClicked(evt);
@@ -233,8 +236,8 @@ public class registro extends javax.swing.JFrame {
         jPanel3.add(jSeparator4, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 130, 254, 10));
         jPanel3.add(jSeparator5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 200, 251, 10));
 
-        jLabel10.setText("Plan de estudio");
-        jPanel3.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 220, -1, -1));
+        jLabelciclo.setText("Ciclo");
+        jPanel3.add(jLabelciclo, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 290, -1, -1));
         jPanel3.add(jSeparator6, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 200, 251, 10));
 
         jLabel11.setText("Escuela");
@@ -248,7 +251,7 @@ public class registro extends javax.swing.JFrame {
         });
         jPanel3.add(facultadCombo, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 100, 250, -1));
 
-        escuelaCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "Ingeniería Sistemas", "Ingeniería Software", " " }));
+        escuelaCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "Ingeniería Sistemas", "Ingeniería Software", "" }));
         escuelaCombo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 escuelaComboActionPerformed(evt);
@@ -256,8 +259,25 @@ public class registro extends javax.swing.JFrame {
         });
         jPanel3.add(escuelaCombo, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 170, 250, -1));
 
-        planCombo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "2015", "2018" }));
-        jPanel3.add(planCombo, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 240, 250, -1));
+        jLabel12.setText("Plan de estudio");
+        jPanel3.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 220, -1, -1));
+
+        planComboCiclo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        planComboCiclo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                planComboCicloActionPerformed(evt);
+            }
+        });
+        jPanel3.add(planComboCiclo, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 310, 250, -1));
+        jPanel3.add(jSeparator7, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 270, 251, 10));
+
+        planCombo2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccionar", "2015", "2018" }));
+        planCombo2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                planCombo2ActionPerformed(evt);
+            }
+        });
+        jPanel3.add(planCombo2, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 240, 250, -1));
 
         jPanel1.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 630, 600));
 
@@ -279,7 +299,7 @@ public class registro extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 900, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -290,21 +310,18 @@ public class registro extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void correoTxtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_correoTxtActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_correoTxtActionPerformed
 
     private void escuelaComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_escuelaComboActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_escuelaComboActionPerformed
 
     private void jPanel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel2MouseClicked
-        // TODO add your handling code here:
         
     }//GEN-LAST:event_jPanel2MouseClicked
 
     private void guardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_guardarMouseClicked
-        // TODO add your handling code here:
-        
         try {
             if(userTxt.getText().equals("") || correoTxt.getText().equals("") || passTxt.getText().equals("")){
                 throw new DatoNoValido("Debe completar todos los campos.");
@@ -317,8 +334,8 @@ public class registro extends javax.swing.JFrame {
             objestudiante.setContraseña(String.valueOf(passTxt.getPassword()));
             objestudiante.setEscuela(escuelaCombo.getSelectedItem().toString());
             objestudiante.setFacultad(facultadCombo.getSelectedItem().toString());
-            objestudiante.setPlan(planCombo.getSelectedItem().toString());
-
+            objestudiante.setPlan(planCombo2.getSelectedItem().toString());
+            objestudiante.setCiclo(planComboCiclo.getSelectedItem().toString());
             ctrlEstudiante.registrar(objestudiante);
             
             JOptionPane.showMessageDialog(this, String.format("Estudiante %s registrado exitosamente",objestudiante.getNombreApellido()));
@@ -331,68 +348,37 @@ public class registro extends javax.swing.JFrame {
     }//GEN-LAST:event_guardarMouseClicked
 
     private void exitTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exitTxtMouseClicked
-        // TODO add your handling code here:
-        //System.exit(0);
-        
         limpiar();
         this.setVisible(false);
     }//GEN-LAST:event_exitTxtMouseClicked
 
     private void jPanel1MouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jPanel1MouseEntered
-        // TODO add your handling code here:
+
         exitBtn.setBackground(Color.red);
     }//GEN-LAST:event_jPanel1MouseEntered
 
     private void exitBtnMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_exitBtnMouseExited
-        // TODO add your handling code here:
         exitBtn.setBackground(Color.white);
     }//GEN-LAST:event_exitBtnMouseExited
 
     private void userTxtMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_userTxtMousePressed
-        // TODO add your handling code here:
-        /*if (userTxt.getText().equals("Ingrese un nombre de usuario")) {
-            userTxt.setText("");
-            userTxt.setForeground(Color.black);
-        }
-        if (String.valueOf(passTxt.getPassword()).isEmpty()){
-            passTxt.setText("********");
-            userTxt.setForeground(Color.gray);  
-        }*/
+
     }//GEN-LAST:event_userTxtMousePressed
 
     private void correoTxtMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_correoTxtMousePressed
-        // TODO add your handling code here:
-        /*if (String.valueOf(passTxt.getPassword()).equals("********")) {
-            passTxt.setText("");
-            passTxt.setForeground(Color.black);
-        }
-        if (userTxt.getText().isEmpty()){
-            userTxt.setText("********");
-            userTxt.setForeground(Color.gray);
-            
-        }*/
+
     }//GEN-LAST:event_correoTxtMousePressed
 
     private void passTxtMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_passTxtMousePressed
-        // TODO add your handling code here:
-        /*if (String.valueOf(passTxt.getPassword()).equals("********")) {
-            passTxt.setText("");
-            passTxt.setForeground(Color.black);
-        }
-        if (userTxt.getText().isEmpty()){
-            userTxt.setText("********");
-            userTxt.setForeground(Color.gray);
-            
-        }*/
+
     }//GEN-LAST:event_passTxtMousePressed
 
     private void facultadComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_facultadComboActionPerformed
-        // TODO add your handling code here:
-        
+  
     }//GEN-LAST:event_facultadComboActionPerformed
 
     private void correoTxtMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_correoTxtMouseClicked
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_correoTxtMouseClicked
     // para mover la ventana
     int xx, xy;
@@ -413,6 +399,14 @@ public class registro extends javax.swing.JFrame {
         this.setVisible(false);
     }//GEN-LAST:event_RegresarMouseClicked
 
+    private void planCombo2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_planCombo2ActionPerformed
+
+    }//GEN-LAST:event_planCombo2ActionPerformed
+
+    private void planComboCicloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_planComboCicloActionPerformed
+
+    }//GEN-LAST:event_planComboCicloActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -427,20 +421,25 @@ public class registro extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Registro.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new registro().setVisible(true);
+                try {
+                    new Registro().setVisible(true);
+                } catch (IOException ex) {
+                    Logger.getLogger(Registro.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
@@ -454,13 +453,14 @@ public class registro extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> facultadCombo;
     private javax.swing.JLabel guardar;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabelciclo;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -471,8 +471,10 @@ public class registro extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JSeparator jSeparator7;
     private javax.swing.JPasswordField passTxt;
-    private javax.swing.JComboBox<String> planCombo;
+    private javax.swing.JComboBox<String> planCombo2;
+    private javax.swing.JComboBox<String> planComboCiclo;
     private javax.swing.JTextField userTxt;
     // End of variables declaration//GEN-END:variables
 

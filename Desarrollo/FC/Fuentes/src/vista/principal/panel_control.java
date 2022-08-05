@@ -1,8 +1,8 @@
 package vista.principal;
 
-public class panel_control {
+public class Panel_control {
 
-    public panel_control() {
+    public Panel_control() {
     }
 
     void setVisible(boolean b) {

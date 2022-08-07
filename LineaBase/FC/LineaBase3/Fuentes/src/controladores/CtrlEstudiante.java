@@ -8,6 +8,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Date;
+import java.sql.Time;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import vista.calendario.NuevaActividad;
 
 public class CtrlEstudiante {
     
@@ -49,8 +54,7 @@ public class CtrlEstudiante {
                 return false;
             }
         }catch (SQLException e){
-            
-            //e.printstackTrace();
+            Logger.getLogger(CtrlEstudiante.class.getName()).log(Level.SEVERE, null, e);
         }
         return false;
     }
@@ -78,14 +82,13 @@ public class CtrlEstudiante {
                 return user;
             }
         }catch (SQLException e){
-            
-            //e.printstackTrace();
+            Logger.getLogger(CtrlEstudiante.class.getName()).log(Level.SEVERE, null, e);
         }
         return user;
     }
     
     public void insertarTarea(Tarea ObjTarea) throws SQLException{
-        String fecha = String.valueOf(ObjTarea.getAnio())+"/"+String.valueOf(ObjTarea.getMes())+"/"+String.valueOf(ObjTarea.getDia());
+        String fecha = String.valueOf(ObjTarea.getAnio())+"-"+String.valueOf(ObjTarea.getMes())+"-"+String.valueOf(ObjTarea.getDia());
         String horaInicio = String.valueOf(ObjTarea.getHoraInicio()) + ":" + String.valueOf(ObjTarea.getMinutoInicio()+ ":00");
         String horaFin = String.valueOf(ObjTarea.getHoraFin()) + ":" + String.valueOf(ObjTarea.getMinutoFin()+ ":00");
         String sql = "INSERT INTO tareas (titulo, fecha, hora_inicio, hora_fin, color_r,color_g,color_b,descripcion,id_estudiante,repeticiones) VALUES ( ?, ?, ?, ?, ?, ?,?, ?, ?,?);";
@@ -93,22 +96,24 @@ public class CtrlEstudiante {
         try(PreparedStatement pstm_insert = conn.prepareStatement(sql)){
             //Asignando parámetros de la sentencia
             pstm_insert.setString(1, ObjTarea.getTitulo());
-            pstm_insert.setString(2, fecha);
-            pstm_insert.setString(3, horaInicio);
-            pstm_insert.setString(4, horaFin);
-            pstm_insert.setString(5, String.valueOf(ObjTarea.getR()));
-            pstm_insert.setString(6, String.valueOf(ObjTarea.getG()));
-            pstm_insert.setString(7, String.valueOf(ObjTarea.getB()));
+            pstm_insert.setDate(2, Date.valueOf(fecha));
+            pstm_insert.setTime(3, Time.valueOf(horaInicio));
+            pstm_insert.setTime(4, Time.valueOf(horaFin));
+            pstm_insert.setInt(5, ObjTarea.getR());
+            pstm_insert.setInt(6, ObjTarea.getG());
+            pstm_insert.setInt(7, ObjTarea.getB());
             pstm_insert.setString(8, ObjTarea.getDescripcion());
-            pstm_insert.setString(9, String.valueOf(ObjTarea.getCodEstudiante()));
-            pstm_insert.setString(10,String.valueOf(ObjTarea.getRepeticiones()));
+            pstm_insert.setInt(9, ObjTarea.getCodEstudiante());
+            pstm_insert.setInt(10,ObjTarea.getRepeticiones());
             //Manipulando, finalmente, la base de datos
             pstm_insert.executeUpdate();
+        }catch (SQLException e){
+            Logger.getLogger(CtrlEstudiante.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     
     public void editarTarea(Tarea ObjTarea) throws SQLException{
-        String fecha = String.valueOf(ObjTarea.getAnio())+"/"+String.valueOf(ObjTarea.getMes())+"/"+String.valueOf(ObjTarea.getDia());
+        String fecha = String.valueOf(ObjTarea.getAnio())+"-"+String.valueOf(ObjTarea.getMes())+"-"+String.valueOf(ObjTarea.getDia());
         String horaInicio = String.valueOf(ObjTarea.getHoraInicio()) + ":" + String.valueOf(ObjTarea.getMinutoInicio()+ ":00");
         String horaFin = String.valueOf(ObjTarea.getHoraFin()) + ":" + String.valueOf(ObjTarea.getMinutoFin()+ ":00");
         String sql = "UPDATE tareas SET titulo = ?, fecha = ?, hora_inicio = ?, hora_fin = ?, color_r = ?, color_g = ?, color_b = ?, descripcion = ?, repeticiones = ? WHERE id_tarea = ?";
@@ -116,16 +121,18 @@ public class CtrlEstudiante {
         try(PreparedStatement pstm_edit = conn.prepareStatement(sql)){
             //Asignando parámetros de la sentencia
             pstm_edit.setString(1, ObjTarea.getTitulo());
-            pstm_edit.setString(2, fecha);
-            pstm_edit.setString(3, horaInicio);
-            pstm_edit.setString(4, horaFin);
-            pstm_edit.setString(5, String.valueOf(ObjTarea.getR()));
-            pstm_edit.setString(6, String.valueOf(ObjTarea.getG()));
-            pstm_edit.setString(7, String.valueOf(ObjTarea.getB()));
+            pstm_edit.setDate(2, Date.valueOf(fecha));
+            pstm_edit.setTime(3, Time.valueOf(horaInicio));
+            pstm_edit.setTime(4, Time.valueOf(horaFin));
+            pstm_edit.setInt(5, ObjTarea.getR());
+            pstm_edit.setInt(6, ObjTarea.getG());
+            pstm_edit.setInt(7, ObjTarea.getB());
             pstm_edit.setString(8, ObjTarea.getDescripcion());
-            pstm_edit.setString(9, String.valueOf(ObjTarea.getRepeticiones()));
-            pstm_edit.setString(10, String.valueOf(ObjTarea.getid()));
+            pstm_edit.setInt(9, ObjTarea.getRepeticiones());
+            pstm_edit.setInt(10,ObjTarea.getid());
             pstm_edit.executeUpdate();
+        }catch (SQLException e){
+            Logger.getLogger(CtrlEstudiante.class.getName()).log(Level.SEVERE, null, e);
         }
     }
     
@@ -133,7 +140,7 @@ public class CtrlEstudiante {
         String sql = "DELETE FROM tareas WHERE id_tarea = ?";
         try(PreparedStatement pstm_eliminar = conn.prepareStatement(sql)){
             //Asignando parámetros de la sentencia
-            pstm_eliminar.setString(1, String.valueOf(id));        
+            pstm_eliminar.setInt(1, id);        
             pstm_eliminar.executeUpdate();
         }
     }
@@ -144,7 +151,7 @@ public class CtrlEstudiante {
         String sql = "SELECT * FROM tareas WHERE id_tarea =?";
 
         try(PreparedStatement ps = objConexion.prepareStatement(sql)){
-            ps.setString(1, ""+id);
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             
             if(rs.next()){
@@ -176,7 +183,7 @@ public class CtrlEstudiante {
                 return obj_tarea;
             }
         }catch (SQLException e){
-            //e.printstackTrace();
+            Logger.getLogger(CtrlEstudiante.class.getName()).log(Level.SEVERE, null, e);
         }
         return obj_tarea;
     }

@@ -69,7 +69,7 @@ public class Calendario extends JFrame {
             // edito los elemento que van a ir en el panel de perfil
             elementosPanelUsuario();
         } catch (SQLException ex) {
-            Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, "NNN", ex);
         }
         obtenerTareas();
         obtenerCursos();
@@ -162,7 +162,7 @@ public class Calendario extends JFrame {
                 try {
                     int id = Integer.parseInt(e.getItem().getId());
                     if(e.getItem().getTask() != null){ // es una tarea
-                        VerEditarEliminarActividad(id);
+                        verEditarEliminarActividad(id);
                     }else{ // es un curso
                         detalleCurso(id);
                     }
@@ -203,7 +203,7 @@ public class Calendario extends JFrame {
         
     }
     // colocar int id entre los parentesis
-    public void VerEditarEliminarActividad(int id) throws SQLException, IOException{
+    public void verEditarEliminarActividad(int id) throws SQLException, IOException{
         VerEditarEliminarActividad vet = new VerEditarEliminarActividad(id);
         calendario.resetDrag();// para inhabilitar el calendario
         vet.setLocationRelativeTo(null);
@@ -302,9 +302,7 @@ public class Calendario extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 try {
                     cerrarSesion();
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
+                } catch (ClassNotFoundException | IOException ex) {
                     Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -373,69 +371,76 @@ public class Calendario extends JFrame {
         Date fechaFin;
         
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-        String sql = "SELECT * FROM tareas WHERE id_estudiante =?";
+        String sql = "SELECT * FROM tareas WHERE id_estudiante = ";
         int r,g,b;
         String fechatxt = "";
         int cont = 0;
-        try(PreparedStatement ps = objConexion.prepareStatement(sql)){
-            
-            ps.setString(1, ""+user.getId());
-            ResultSet rs = ps.executeQuery();
-            
-            while(rs.next()){
-                Appointment item = new Appointment();
-                Style estilo = item.getStyle();
-                estilo.setLineColor(Colors.Black);
-                estilo.setHeaderTextColor(Colors.Black);
-                item.setId(rs.getString("id_tarea"));// pasamos el id al item
-                item.setHeaderText(rs.getString("titulo"));
-                
-                item.setDescriptionText(rs.getString("descripcion"));
-                
-                fechatxt = rs.getString("fecha").substring(8, 10) + "/" + rs.getString("fecha").substring(5, 7) + "/" + rs.getString("fecha").substring(0, 4);
-                fecha = formato.parse(fechatxt + " " + rs.getString("hora_inicio"));
-                DateTime primerDia = new DateTime(fecha);
-                
-                fechaFin = formato.parse(fechatxt + " " + rs.getString("hora_fin"));
-                
-                DateTime finDia = new DateTime(fechaFin);
-                
-                item.setStartTime(primerDia); // dia de hoy a las 12
-                item.setEndTime(finDia);
-                
-                r = Integer.parseInt(rs.getString("color_r"));
-                g = Integer.parseInt(rs.getString("color_g"));
-                b = Integer.parseInt(rs.getString("color_b"));
-                estilo.setBrush(new SolidBrush(new Color(r,g,b))); //color de fondo      
-                
-                Task tarea = new Task(); // como distintivo de las tareas le agrego un task
-                tarea.setName("tarea");
-                item.setTask(tarea);
-                
-                //AGREGAMOS RECURRENCIA
-                Recurrence re = new Recurrence();
-                re.setWeeks(1);// 1 vez por semana 
-                re.setStartDate(primerDia);//desde este dia es que realiza la recurrencia
+        try(PreparedStatement ps = objConexion.prepareStatement(sql);){
+            sql = sql+user.getId();
+            //PreparedStatement ps = objConexion.prepareStatement(sql);
+            try(ResultSet rs = ps.executeQuery();){
+                //ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    Appointment item = new Appointment();
+                    Style estilo = item.getStyle();
+                    estilo.setLineColor(Colors.Black);
+                    estilo.setHeaderTextColor(Colors.Black);
+                    item.setId(rs.getString("id_tarea"));// pasamos el id al item
+                    item.setHeaderText(rs.getString("titulo"));
 
-                re.setDaysOfWeek(EnumSet.of(primerDia.getDayOfWeek()));// pasamos el dia de la semana que tiene la fecha primerDia, en este caso es martes, por lo que se repite cada martes
-                
-                re.setNumOccurrences(Integer.parseInt(rs.getString("repeticiones"))); // numero de ocurrencias
-                re.setRecurrenceEnd(RecurrenceEnd.NumOccurrences); // asignamos el numero de ocurrencias
-                
-                item.setRecurrence(re);
-                
-                // AGREGAMOS EL ITEM AL CALENDARIO
-                calendario.getSchedule().getItems().add(item);
-                cont++;
+                    item.setDescriptionText(rs.getString("descripcion"));
+
+                    fechatxt = rs.getString("fecha").substring(8, 10) + "/" + rs.getString("fecha").substring(5, 7) + "/" + rs.getString("fecha").substring(0, 4);
+                    fecha = formato.parse(fechatxt + " " + rs.getString("hora_inicio"));
+                    DateTime primerDia = new DateTime(fecha);
+
+                    fechaFin = formato.parse(fechatxt + " " + rs.getString("hora_fin"));
+
+                    DateTime finDia = new DateTime(fechaFin);
+
+                    item.setStartTime(primerDia); // dia de hoy a las 12
+                    item.setEndTime(finDia);
+
+                    r = Integer.parseInt(rs.getString("color_r"));
+                    g = Integer.parseInt(rs.getString("color_g"));
+                    b = Integer.parseInt(rs.getString("color_b"));
+                    estilo.setBrush(new SolidBrush(new Color(r,g,b))); //color de fondo      
+
+                    Task tarea = new Task(); // como distintivo de las tareas le agrego un task
+                    tarea.setName("tarea");
+                    item.setTask(tarea);
+
+                    //AGREGAMOS RECURRENCIA
+                    Recurrence re = new Recurrence();
+                    re.setWeeks(1);// 1 vez por semana 
+                    re.setStartDate(primerDia);//desde este dia es que realiza la recurrencia
+
+                    re.setDaysOfWeek(EnumSet.of(primerDia.getDayOfWeek()));// pasamos el dia de la semana que tiene la fecha primerDia, en este caso es martes, por lo que se repite cada martes
+
+                    re.setNumOccurrences(Integer.parseInt(rs.getString("repeticiones"))); // numero de ocurrencias
+                    re.setRecurrenceEnd(RecurrenceEnd.NumOccurrences); // asignamos el numero de ocurrencias
+
+                    item.setRecurrence(re);
+
+                    // AGREGAMOS EL ITEM AL CALENDARIO
+                    calendario.getSchedule().getItems().add(item);
+                    cont++;
+                }
+            }catch (SQLException e){
+                Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, e);
+            }finally{
+                System.out.println();
             }
         }catch (SQLException e){
-            System.out.println("uno un problema...");
+            Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, e);
+        }finally{
+                System.out.println();
         }
     }
     
     private void obtenerCursos() throws ParseException, IOException{
         Connection objConexion = ConexionBD.conectar();
-        String sql = "SELECT * FROM curso WHERE ciclo =?";
+        String sql = "SELECT * FROM curso WHERE ciclo =";
         
         Date fecha;
         Date fechaFin;
@@ -445,54 +450,60 @@ public class Calendario extends JFrame {
         int r,g,b;
         String fechatxt = "";
         int cont = 0;
-        try(PreparedStatement ps = objConexion.prepareStatement(sql)){
-            
-            ps.setString(1, ""+user.getCiclo());
-            ResultSet rs = ps.executeQuery();
-            while(rs.next()){
-                Appointment item = new Appointment();
-                Style estilo = item.getStyle();
-                estilo.setLineColor(Colors.Black);
-                //estilo.setHeaderFont(fuente);
-                estilo.setHeaderTextColor(Colors.Black);
-                item.setId(rs.getString("id_curso"));// pasamos el id al item
-                item.setHeaderText(rs.getString("nombre"));
-                
-                item.setDescriptionText("Docente: " + rs.getString("docente") + "\nPlan: " + rs.getString("plan") + "\nPeriodo academico: " + rs.getString("periodo_academico"));
-                
-                fechatxt = rs.getString("fecha_inicio").substring(8, 10) + "/" + rs.getString("fecha_inicio").substring(5, 7) + "/" + rs.getString("fecha_inicio").substring(0, 4);
-                fecha = formato.parse(fechatxt + " " + rs.getString("hora_inicio"));
-                DateTime primerDia = new DateTime(fecha);
-                
-                fechaFin = formato.parse(fechatxt + " " + rs.getString("hora_fin"));
-                DateTime finDia = new DateTime(fechaFin);
-                
-                item.setStartTime(primerDia); // dia de hoy a las 12
-                item.setEndTime(finDia);
-                
-                // bloquemos el item
-                item.setAllowMove(false);
-                item.setLocked(true);
-                
-                // insertamos el item
-                calendario.getSchedule().getItems().add(item);
-                
-                Recurrence re = new Recurrence();
-                re.setWeeks(1);// 1 vez por semana 
-                re.setStartDate(primerDia);//desde este dia es que realiza la recurrencia
+        try(PreparedStatement ps = objConexion.prepareStatement(sql);){
+            sql = sql+user.getCiclo();
+            //PreparedStatement ps = objConexion.prepareStatement(sql);
+            try(ResultSet rs = ps.executeQuery();){
+                //ResultSet rs = ps.executeQuery();
+                while(rs.next()){
+                    Appointment item = new Appointment();
+                    Style estilo = item.getStyle();
+                    estilo.setLineColor(Colors.Black);
+                    //estilo.setHeaderFont(fuente);
+                    estilo.setHeaderTextColor(Colors.Black);
+                    item.setId(rs.getString("id_curso"));// pasamos el id al item
+                    item.setHeaderText(rs.getString("nombre"));
 
-                re.setDaysOfWeek(EnumSet.of(primerDia.getDayOfWeek()));// pasamos el dia de la semana que tiene la fecha primerDia, en este caso es martes, por lo que se repite cada martes
-                
-                re.setNumOccurrences(Integer.parseInt(rs.getString("cantidad_semanas"))); // numero de ocurrencias
-                re.setRecurrenceEnd(RecurrenceEnd.NumOccurrences); // asignamos el numero de ocurrencias
-                
-                item.setRecurrence(re);
-                
-                
-                cont++;
-            }
+                    item.setDescriptionText("Docente: " + rs.getString("docente") + "\nPlan: " + rs.getString("plan") + "\nPeriodo academico: " + rs.getString("periodo_academico"));
+
+                    fechatxt = rs.getString("fecha_inicio").substring(8, 10) + "/" + rs.getString("fecha_inicio").substring(5, 7) + "/" + rs.getString("fecha_inicio").substring(0, 4);
+                    fecha = formato.parse(fechatxt + " " + rs.getString("hora_inicio"));
+                    DateTime primerDia = new DateTime(fecha);
+
+                    fechaFin = formato.parse(fechatxt + " " + rs.getString("hora_fin"));
+                    DateTime finDia = new DateTime(fechaFin);
+
+                    item.setStartTime(primerDia); // dia de hoy a las 12
+                    item.setEndTime(finDia);
+
+                    // bloquemos el item
+                    item.setAllowMove(false);
+                    item.setLocked(true);
+
+                    // insertamos el item
+                    calendario.getSchedule().getItems().add(item);
+
+                    Recurrence re = new Recurrence();
+                    re.setWeeks(1);// 1 vez por semana 
+                    re.setStartDate(primerDia);//desde este dia es que realiza la recurrencia
+
+                    re.setDaysOfWeek(EnumSet.of(primerDia.getDayOfWeek()));// pasamos el dia de la semana que tiene la fecha primerDia, en este caso es martes, por lo que se repite cada martes
+
+                    re.setNumOccurrences(Integer.parseInt(rs.getString("cantidad_semanas"))); // numero de ocurrencias
+                    re.setRecurrenceEnd(RecurrenceEnd.NumOccurrences); // asignamos el numero de ocurrencias
+
+                    item.setRecurrence(re);
+                    cont++;
+                }
+            }catch (SQLException e){
+                Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, e);
+            }finally{
+                    System.out.println();
+            }   
         }catch (SQLException e){
-            System.out.println(e.getMessage());
+            Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, e);
+        }finally{
+                System.out.println();
         }
     }
 }

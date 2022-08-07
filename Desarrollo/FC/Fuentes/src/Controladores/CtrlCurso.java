@@ -7,6 +7,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import vista.calendario.NuevaActividad;
 
 public class CtrlCurso {
     
@@ -22,7 +25,7 @@ public class CtrlCurso {
         String sql = "SELECT * FROM curso WHERE id_curso =?";
         try(PreparedStatement ps = objConexion.prepareStatement(sql)){
             
-            ps.setString(1, ""+id);
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if(rs.next()){
                 
@@ -34,7 +37,7 @@ public class CtrlCurso {
                 String Fecha = rs.getString(15);
                 String[] SeparadorFecha = Fecha.split("-");
                 
-                obj_curso.setId(Integer.parseInt(rs.getString(1)));
+                obj_curso.setId(17);
                 obj_curso.setNombre(rs.getString(2));
                 obj_curso.setDocente(rs.getString(3));
                 obj_curso.setCantidad_semanas(Integer.parseInt(rs.getString(8)));
@@ -50,13 +53,14 @@ public class CtrlCurso {
                 obj_curso.setDia(Integer.parseInt(SeparadorFecha[2]));
                 obj_curso.setMes(Integer.parseInt(SeparadorFecha[1]));
                 obj_curso.setAnio(Integer.parseInt(SeparadorFecha[0]));
-
+                
                 return obj_curso;
             }else{
+                obj_curso.setNombre("fff");
                 return obj_curso;
             }
         }catch (SQLException e){
-            //e.printstackTrace();
+            Logger.getLogger(CtrlCurso.class.getName()).log(Level.SEVERE, null, e);
         }
         
         return obj_curso;

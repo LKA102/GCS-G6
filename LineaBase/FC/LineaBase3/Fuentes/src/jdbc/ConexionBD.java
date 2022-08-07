@@ -12,8 +12,15 @@ import java.sql.SQLException;
 
 public class ConexionBD {
     public static Connection conectar() throws IOException{
-        String urlConnection = "jdbc:mysql://localhost:3306/dbfollowclass";
-        String user = "root";
+        
+        //BD REMOTA
+        /*String urlConnection = "jdbc:postgresql://ec2-3-219-52-220.compute-1.amazonaws.com:5432/d1bqrln047024d";
+        String user = "ublnbtjltkosrh";
+        Path path = Paths.get("dbremota.txt");*/
+        
+        //BD LOCAL
+        String urlConnection = "jdbc:postgresql://localhost:5432/dbfollowclass";
+        String user = "postgres";
 
         Path path = Paths.get("db.txt");
 

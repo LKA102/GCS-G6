@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JColorChooser;
+import javax.swing.JOptionPane;
 
 public class VerEditarEliminarActividad extends javax.swing.JDialog {
     public static Appointment app;
@@ -32,8 +33,8 @@ public class VerEditarEliminarActividad extends javax.swing.JDialog {
         txtTitulo.setText(obj_tarea.getTitulo());
         TxtDescripcion.setText(obj_tarea.getDescripcion());
         txtDia.setText(String.valueOf(obj_tarea.getDia()));
-
-        cmbMes.setSelectedItem(mess());
+        
+        cmbMes.setSelectedIndex(obj_tarea.getMes());
         cmbAnio.setSelectedItem(String.valueOf(obj_tarea.getAnio()));
         
         Color co = new Color(obj_tarea.getR(),obj_tarea.getG(),obj_tarea.getB());
@@ -377,7 +378,7 @@ public class VerEditarEliminarActividad extends javax.swing.JDialog {
             app.setStartTime(primerDia); // dia de hoy a las 12
             app.setEndTime(finDia);// hasta las 4 horas (de 0 a 5)(no se si suma 5 horas o va a la hora 5)
         } catch (ParseException ex) {
-            Logger.getLogger(NuevaActividad.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(Level.SEVERE, null, ex);
         }
         Font fuente=new Font("TimesRoman", Font.BOLD, 12);
         Style estilo = app.getStyle();
@@ -424,7 +425,7 @@ public class VerEditarEliminarActividad extends javax.swing.JDialog {
         try {//primera 
             dato.editarTarea(ta);
         } catch (SQLException ex) {
-            Logger.getLogger(NuevaActividad.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_BtnEditarActionPerformed
 
@@ -439,7 +440,7 @@ public class VerEditarEliminarActividad extends javax.swing.JDialog {
         try {
             dato.eliminarTarea(obj_tarea.getid());
         } catch (SQLException ex) {
-            Logger.getLogger(NuevaActividad.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(Level.SEVERE, null, ex);
         }
         this.setVisible(false);
     }//GEN-LAST:event_BtnEliminarActionPerformed
@@ -460,12 +461,11 @@ public class VerEditarEliminarActividad extends javax.swing.JDialog {
         }
         return 1;
     }
-    
+        
     private String mess(){//retorna el nombre del mes
         String[] meses = {"Enero","Febrero","Marzo","Abril",
                           "Mayo","Junio","Julio","Agosto",
                           "Septiembre","Octubre","Noviembre","Diciembre"};
-
         return meses[obj_tarea.getMes()-1];
     }
 
@@ -482,15 +482,12 @@ public class VerEditarEliminarActividad extends javax.swing.JDialog {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(VerEditarEliminarActividad.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
+        
         //</editor-fold>
         //</editor-fold>
 

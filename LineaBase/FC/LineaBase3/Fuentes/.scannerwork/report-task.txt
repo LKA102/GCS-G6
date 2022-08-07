@@ -1,6 +1,6 @@
-projectKey=ProyectoCalidad
+projectKey=Proyecto_GCM_Grupo6
 serverUrl=http://localhost:9000
 serverVersion=9.5.0.56709
-dashboardUrl=http://localhost:9000/dashboard?id=ProyectoCalidad
-ceTaskId=AYJdAbNPgVYqwAuzVps1
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AYJdAbNPgVYqwAuzVps1
+dashboardUrl=http://localhost:9000/dashboard?id=Proyecto_GCM_Grupo6
+ceTaskId=AYJxLAaaOOGC8eT41zda
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AYJxLAaaOOGC8eT41zda

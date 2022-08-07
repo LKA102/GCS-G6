@@ -1,4 +1,4 @@
- package test;
+package test;
 
 import jdbc.ConexionBD;
 import java.io.IOException;

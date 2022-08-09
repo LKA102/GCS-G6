@@ -71,8 +71,16 @@ public class Calendario extends JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, "NNN", ex);
         }
-        obtenerTareas();
-        obtenerCursos();
+        try {
+            obtenerTareas();
+        } catch (SQLException ex) {
+            Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            obtenerCursos();
+        } catch (SQLException ex) {
+            Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         // PANELES
         
@@ -179,6 +187,8 @@ public class Calendario extends JFrame {
                     obtenerCursos();
                 } catch (ParseException | IOException ex) {
                     Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (SQLException ex) {
+                    Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
@@ -198,6 +208,8 @@ public class Calendario extends JFrame {
             obtenerTareas();// mostramos nuevamente
             obtenerCursos();
         } catch (ParseException ex) {
+            Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
             Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -364,22 +376,22 @@ public class Calendario extends JFrame {
         PInfoUser.add(img);
     }
     
-    private void obtenerTareas() throws ParseException, IOException{
+    private void obtenerTareas() throws ParseException, IOException, SQLException{
         Connection objConexion = ConexionBD.conectar();
-        
         Date fecha;
         Date fechaFin;
-        
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         String sql = "SELECT * FROM tareas WHERE id_estudiante = ";
         int r,g,b;
         String fechatxt = "";
         int cont = 0;
-        try(PreparedStatement ps = objConexion.prepareStatement(sql);){
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try{
             sql = sql+user.getId();
-            //PreparedStatement ps = objConexion.prepareStatement(sql);
-            try(ResultSet rs = ps.executeQuery();){
-                //ResultSet rs = ps.executeQuery();
+            ps = objConexion.prepareStatement(sql);
+            try{
+                rs = ps.executeQuery();
                 while(rs.next()){
                     Appointment item = new Appointment();
                     Style estilo = item.getStyle();
@@ -429,32 +441,33 @@ public class Calendario extends JFrame {
             }catch (SQLException e){
                 Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, e);
             }finally{
-                System.out.println();
+                rs.close();
             }
         }catch (SQLException e){
             Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, e);
         }finally{
-                System.out.println();
+                ps.clearParameters();
+                ps.close();
         }
     }
     
-    private void obtenerCursos() throws ParseException, IOException{
+    private void obtenerCursos() throws ParseException, IOException, SQLException{
         Connection objConexion = ConexionBD.conectar();
         String sql = "SELECT * FROM curso WHERE ciclo =";
-        
+        PreparedStatement ps = null;
+        ResultSet rs = null;
         Date fecha;
         Date fechaFin;
-        
         SimpleDateFormat formato = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
         int r,g,b;
         String fechatxt = "";
         int cont = 0;
-        try(PreparedStatement ps = objConexion.prepareStatement(sql);){
+        try{
             sql = sql+user.getCiclo();
-            //PreparedStatement ps = objConexion.prepareStatement(sql);
-            try(ResultSet rs = ps.executeQuery();){
-                //ResultSet rs = ps.executeQuery();
+            ps = objConexion.prepareStatement(sql);
+            try{
+                rs = ps.executeQuery();
                 while(rs.next()){
                     Appointment item = new Appointment();
                     Style estilo = item.getStyle();
@@ -498,12 +511,13 @@ public class Calendario extends JFrame {
             }catch (SQLException e){
                 Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, e);
             }finally{
-                    System.out.println();
-            }   
+                rs.close();
+            }
         }catch (SQLException e){
             Logger.getLogger(Calendario.class.getName()).log(Level.SEVERE, null, e);
         }finally{
-                System.out.println();
+            ps.clearParameters();
+            ps.close();
         }
     }
 }
